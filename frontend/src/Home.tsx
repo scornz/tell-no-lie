@@ -8,33 +8,80 @@ import {
   Input,
   Button,
 } from "@chakra-ui/react";
+import axios from "axios";
+import MessageLoadingPlaceholder from "./MessageLoadingPlaceholder";
 
 type Message = {
   user: "me" | "them";
   text: string;
   id: number;
+  loading: boolean;
 };
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Home() {
   const [messages, setMessages] = useState<Array<Message>>([]);
-  const [lastChangedIndex, setLastChangedIndex] = useState(null);
   const [input, setInput] = useState("");
 
-  function trySendMessage() {
-    if (input != "") {
+  let nextId = messages.length + 1;
+
+  async function trySendMessage() {
+    if (input !== "") {
       addMessage(input, "me");
       setInput("");
+
+      let body = {
+        messages: [
+          ...messages
+            .slice()
+            .reverse()
+            .map((m) => {
+              return {
+                role: m.user === "me" ? "user" : "assistant",
+                content: m.text,
+              };
+            }),
+          {
+            role: "user",
+            content: input,
+          },
+        ],
+      };
+
+      await delay(500);
+
+      const messageId = addMessage("", "them");
+      axios.post("http://127.0.0.1:8080/chat/", body).then((res) => {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === messageId
+              ? {
+                  id: messageId,
+                  user: "them",
+                  text: res.data.msg,
+                  loading: false,
+                }
+              : m
+          )
+        );
+        // addMessage(res.data.msg, "them");
+      });
     }
   }
 
   function addMessage(content: string, user: "me" | "them") {
-    let id = messages.length ? Math.max(...messages.map((m) => m.id)) + 1 : 1;
+    let id = nextId;
     let message: Message = {
       id: id,
       user: user,
       text: content,
+      loading: user === "them",
     };
-    setMessages([message, ...messages]);
+
+    nextId += 1;
+    setMessages((prev) => [message, ...prev]);
+    return id;
   }
 
   return (
@@ -51,7 +98,7 @@ export default function Home() {
               layout: {
                 type: "spring",
                 bounce: 0.4,
-                duration: lastChangedIndex ? index * 0.09 + 0.4 : 1,
+                duration: index * 0.09 + 0.4,
               },
             }}
             style={{
@@ -65,10 +112,27 @@ export default function Home() {
                   message.user === "me"
                     ? "bg-blue-500 ml-auto"
                     : "bg-gray-500 mr-auto"
-                } px-3 py-1 bg-blue-500 text-white text-left rounded-full select-none`}
-                style={{ WebkitTapHighlightColor: "transparent" }}
+                } py-2 px-4 bg-blue-500 text-white text-left rounded-3xl select-none flex -space-x-7`}
+                style={{
+                  WebkitTapHighlightColor: "transparent",
+                  maxWidth: "80%",
+                }}
               >
-                {message.text}
+                <AnimatePresence>
+                  {message.loading ? (
+                    <MessageLoadingPlaceholder key={1} />
+                  ) : (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      key={2}
+                      className="static"
+                    >
+                      {message.text}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </button>
             </div>
           </motion.li>
@@ -96,9 +160,9 @@ export default function Home() {
             placeholder="Send a message"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => {
+            onKeyPress={async (e) => {
               if (e.key === "Enter") {
-                trySendMessage();
+                await trySendMessage();
               }
             }}
           />

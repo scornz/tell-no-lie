@@ -60,6 +60,4 @@ def handle_exception(e: Exception):
     elif et in _server:
         return HttpInternalServerError(e)
     else:
-        return InternalServerError(
-            f"{et} exception occurred, but has not been configured on the server: {e}"
-        )
+        raise e
