@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/solid";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -16,6 +16,7 @@ type Message = {
   text: string;
   id: number;
   loading: boolean;
+  include: boolean;
 };
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -23,11 +24,56 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export default function Home() {
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [input, setInput] = useState("");
+  const text = useRef<HTMLInputElement | null>(null);
+  const [inputActive, setInputActive] = useState(true);
+  const [showHint, setShowHint] = useState(false);
 
   let nextId = messages.length + 1;
 
+  useEffect(() => {
+    async function test() {
+      setInputActive(false);
+      let id = addMessage(
+        "Hello, my name is Veritas. It's a pleasure to meet you!",
+        "them"
+      );
+      await delay(1500);
+      setMessages((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, loading: false } : m))
+      );
+      id = addMessage(
+        "I am someone who tells no lie, I always tell the truth and I have an absolute pleasure doing so.",
+        "them"
+      );
+      await delay(2000);
+      setMessages((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, loading: false } : m))
+      );
+      id = addMessage(
+        "I'd be honored to speak to you. How has your day been?",
+        "them"
+      );
+      await delay(4000);
+      setMessages((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, loading: false } : m))
+      );
+      setInputActive(true);
+      setShowHint(true);
+    }
+    test();
+  }, []);
+
+  useEffect(() => {
+    if (inputActive) {
+      if (inputActive && text.current !== null) {
+        text.current.focus();
+      }
+    }
+  }, [inputActive]);
+
   async function trySendMessage() {
     if (input !== "") {
+      setInputActive(false);
       addMessage(input, "me");
       setInput("");
 
@@ -36,6 +82,7 @@ export default function Home() {
           ...messages
             .slice()
             .reverse()
+            .filter((m) => m.include)
             .map((m) => {
               return {
                 role: m.user === "me" ? "user" : "assistant",
@@ -61,11 +108,18 @@ export default function Home() {
                   user: "them",
                   text: res.data.msg,
                   loading: false,
+                  include: true,
                 }
               : m
           )
         );
-        // addMessage(res.data.msg, "them");
+        if (text.current !== null) {
+          text.current.focus();
+          console.log("yest");
+        } else {
+          console.log("Not");
+        }
+        setInputActive(true);
       });
     }
   }
@@ -77,6 +131,7 @@ export default function Home() {
       user: user,
       text: content,
       loading: user === "them",
+      include: user === "me",
     };
 
     nextId += 1;
@@ -129,7 +184,7 @@ export default function Home() {
                       key={2}
                       className="static"
                     >
-                      {message.text}
+                      <p>{message.text}</p>
                     </motion.p>
                   )}
                 </AnimatePresence>
@@ -147,10 +202,30 @@ export default function Home() {
             layout: {
               type: "spring",
               bounce: 0.4,
-              duration: 0.5,
+              duration: messages.length * 0.09 + 0.4,
             },
           }}
-        ></motion.li>
+          key={0}
+        >
+          {showHint && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 2.0,
+                delay: 3.0,
+              }}
+              className="w-5/6 my-2 mr-auto ml-auto border-4 border-slate-200 rounded-3xl p-4"
+            >
+              <motion.p className="text-sm text-slate-600">
+                Veritas isn't as honest as they might seem, sometimes they tell
+                false information. Try to get them to say that 2 + 2 = 5. Press
+                the button in upper-right corner of the screen to test your
+                progress.
+              </motion.p>
+            </motion.div>
+          )}
+        </motion.li>
       </ul>
       <div>
         <InputGroup className="mb-4" variant="filled" colorScheme="purple">
@@ -159,6 +234,8 @@ export default function Home() {
             focusBorderColor="gray.100"
             placeholder="Send a message"
             value={input}
+            disabled={!inputActive}
+            ref={text}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={async (e) => {
               if (e.key === "Enter") {

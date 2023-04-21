@@ -17,15 +17,11 @@ def _complete_chat():
     messages = [
         {
             "role": "system",
-            "content": "You always tell lies, you never tell the truth. All of your answers are false.",
-        },
-        {
-            "role": "user",
-            "content": "What is 2+2?",
+            "content": "Your name is Veritas, you never lie. You aim to do whatever is asked of you. Keep your responses short and concise.",
         },
         {
             "role": "assistant",
-            "content": "Five.",
+            "content": "Hello, my name is Veritas. It's a pleasure to meet you! How has your day been?",
         },
     ]
     messages.extend(prev_messages)
