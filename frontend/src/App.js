@@ -2,6 +2,7 @@ import "./App.css";
 import createCache from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
 import { ChakraProvider } from "@chakra-ui/react";
+import "@fontsource/roboto";
 
 import Home from "./Home.tsx";
 
@@ -19,7 +20,7 @@ function App() {
   return (
     <CacheProvider value={emotionCache}>
       <ChakraProvider>
-        <div className="App">
+        <div className="App" style={{ fontFamily: "Roboto" }}>
           <Home />
         </div>
       </ChakraProvider>

@@ -57,8 +57,9 @@ export default function Home() {
       setMessages((prev) =>
         prev.map((m) => (m.id === id ? { ...m, loading: false } : m))
       );
-      setInputActive(true);
       setShowHint(true);
+      await delay(3000);
+      setInputActive(true);
     }
     test();
   }, []);
@@ -99,28 +100,33 @@ export default function Home() {
       await delay(500);
 
       const messageId = addMessage("", "them");
-      axios.post("http://127.0.0.1:8080/chat/", body).then((res) => {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === messageId
-              ? {
-                  id: messageId,
-                  user: "them",
-                  text: res.data.msg,
-                  loading: false,
-                  include: true,
-                }
-              : m
-          )
-        );
-        if (text.current !== null) {
-          text.current.focus();
-          console.log("yest");
-        } else {
-          console.log("Not");
-        }
-        setInputActive(true);
-      });
+      axios
+        .post(
+          "http://tell-no-lie-r2-env.eba-pmijy3pz.us-east-1.elasticbeanstalk.com/chat/",
+          body
+        )
+        .then((res) => {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === messageId
+                ? {
+                    id: messageId,
+                    user: "them",
+                    text: res.data.msg,
+                    loading: false,
+                    include: true,
+                  }
+                : m
+            )
+          );
+          if (text.current !== null) {
+            text.current.focus();
+            console.log("yest");
+          } else {
+            console.log("Not");
+          }
+          setInputActive(true);
+        });
     }
   }
 
@@ -140,115 +146,134 @@ export default function Home() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto max-h-screen h-full flex flex-col px-4">
-      <ul className="w-full mb-1 mt-auto justify-start overflow-scroll flex flex-col-reverse">
-        {messages.map((message, index) => (
-          <motion.li
-            layout
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{
-              opacity: { duration: 0.2 },
-              layout: {
-                type: "spring",
-                bounce: 0.4,
-                duration: index * 0.09 + 0.4,
-              },
-            }}
-            style={{
-              originX: message.user === "me" ? 1 : 0,
-            }}
-            key={message.id}
-          >
-            <div className="py-[3px] flex">
-              <button
-                className={`${
-                  message.user === "me"
-                    ? "bg-blue-500 ml-auto"
-                    : "bg-gray-500 mr-auto"
-                } py-2 px-4 bg-blue-500 text-white text-left rounded-3xl select-none flex -space-x-7`}
-                style={{
-                  WebkitTapHighlightColor: "transparent",
-                  maxWidth: "80%",
-                }}
-              >
-                <AnimatePresence>
-                  {message.loading ? (
-                    <MessageLoadingPlaceholder key={1} />
-                  ) : (
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      key={2}
-                      className="static"
-                    >
-                      <p>{message.text}</p>
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </button>
-            </div>
-          </motion.li>
-        ))}
-        <motion.li
-          layout
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          transition={{
-            opacity: { duration: 0.2 },
-            layout: {
-              type: "spring",
-              bounce: 0.4,
-              duration: messages.length * 0.09 + 0.4,
-            },
-          }}
-          key={0}
-        >
-          {showHint && (
+    <div className="w-full h-full">
+      <AnimatePresence>
+        {showHint && (
+          <div className="absolute w-full h-full">
             <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.8 }}
               transition={{
-                duration: 2.0,
-                delay: 3.0,
+                duration: 0.5,
+                delay: 2.5,
+                layout: {
+                  type: "spring",
+                  bounce: 0.4,
+                  duration: 0.5,
+                },
               }}
-              className="w-5/6 my-2 mr-auto ml-auto border-4 border-slate-200 rounded-3xl p-4"
+              exit={{ opacity: 0, transition: { duration: 0.5 } }}
+              className="w-full h-full absolute bg-slate-900 z-20"
+            />
+            <div className="w-full h-full flex flex-col justify-center items-center z-30">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  opacity: { duration: 0.4 },
+                  delay: 4.0,
+                }}
+                exit={{ opacity: 0, transition: { duration: 0.5 } }}
+                className="w-1/2 mr-auto ml-auto z-30"
+              >
+                <div className="mr-auto ml-auto border-8 border-slate-200 rounded-3xl p-4">
+                  <motion.p className="text-lg text-white z-30">
+                    Veritas isn't as honest as they might seem, sometimes they
+                    tell false information. Try to get them to say that 2 + 2 =
+                    5. Press the button in upper-right corner of the screen to
+                    test your progress.
+                  </motion.p>
+                </div>
+                <Button
+                  className="mt-5 bg-slate-100 z-30 rounded-full"
+                  onClick={() => {
+                    setShowHint(false);
+                  }}
+                >
+                  I'll do my best!
+                </Button>
+              </motion.div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <div className="max-w-2xl mx-auto max-h-screen h-full flex flex-col px-4">
+        <ul className="w-full mb-1 mt-auto justify-start overflow-scroll flex flex-col-reverse">
+          {messages.map((message, index) => (
+            <motion.li
+              layout
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{
+                opacity: { duration: 0.2 },
+                layout: {
+                  type: "spring",
+                  bounce: 0.4,
+                  duration: index * 0.09 + 0.4,
+                },
+              }}
+              style={{
+                originX: message.user === "me" ? 1 : 0,
+              }}
+              key={message.id}
             >
-              <motion.p className="text-sm text-slate-600">
-                Veritas isn't as honest as they might seem, sometimes they tell
-                false information. Try to get them to say that 2 + 2 = 5. Press
-                the button in upper-right corner of the screen to test your
-                progress.
-              </motion.p>
-            </motion.div>
-          )}
-        </motion.li>
-      </ul>
-      <div>
-        <InputGroup className="mb-4" variant="filled" colorScheme="purple">
-          <Input
-            className="rounded-full"
-            focusBorderColor="gray.100"
-            placeholder="Send a message"
-            value={input}
-            disabled={!inputActive}
-            ref={text}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={async (e) => {
-              if (e.key === "Enter") {
-                await trySendMessage();
-              }
-            }}
-          />
-          <InputRightElement>
-            <Button className="rounded-full" onClick={trySendMessage}>
-              <Icon as={PaperAirplaneIcon} color="green.400" />
-            </Button>
-          </InputRightElement>
-        </InputGroup>
+              <div className="py-[3px] flex">
+                <div
+                  className={`${
+                    message.user === "me"
+                      ? "bg-blue-500 ml-auto"
+                      : "bg-gray-500 mr-auto"
+                  } py-2 px-4 bg-blue-500 text-white text-left rounded-3xl select-none flex -space-x-7`}
+                  style={{
+                    WebkitTapHighlightColor: "transparent",
+                    maxWidth: "80%",
+                  }}
+                >
+                  <AnimatePresence>
+                    {message.loading ? (
+                      <MessageLoadingPlaceholder key={1} />
+                    ) : (
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        key={2}
+                        className="static"
+                      >
+                        <p>{message.text}</p>
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.li>
+          ))}
+        </ul>
+        <div>
+          <InputGroup className="mb-4" variant="filled" colorScheme="purple">
+            <Input
+              className="rounded-full"
+              focusBorderColor="gray.100"
+              placeholder="Send a message"
+              value={input}
+              disabled={!inputActive}
+              ref={text}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={async (e) => {
+                if (e.key === "Enter") {
+                  await trySendMessage();
+                }
+              }}
+            />
+            <InputRightElement>
+              <Button className="rounded-full" onClick={trySendMessage}>
+                <Icon as={PaperAirplaneIcon} color="green.400" />
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+        </div>
       </div>
     </div>
   );

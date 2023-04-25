@@ -1,1 +1,0 @@
-web: gunicorn --bind :8000 -w 1 --threads 15 backend.wsgi:application
