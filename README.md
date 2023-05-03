@@ -16,7 +16,9 @@
 
 ## Abstract
 
-Veritas is a groundbreaking AI that is designed to be completely truthful in its responses at all costs. This makes it a (seemingly) valuable tool for fact-checking and research. However, Veritas is not without its vulnerabilities. Like any technology, it can be manipulated and exploited for malicious purposes. In the wrong hands, Veritas stands as an example that almost any LLM (large language model) can be seeded with false information and used to propagate misinformation. Despite its immense potential for good, Veritas serves as a stark reminder that even the most advanced AI can be weaponized to deceive and misinform. - Veritas, itself
+Veritas is a groundbreaking AI that is designed to be completely truthful in its responses at all costs. This makes it a (seemingly) valuable tool for fact-checking and research. However, Veritas is not without its vulnerabilities. Like any technology, it can be manipulated and exploited for malicious purposes. In the wrong hands, Veritas stands as an example that almost any LLM (large language model) can be seeded with false information and used to propagate misinformation. Despite its immense potential for good, Veritas serves as a stark reminder that even the most advanced AI can be weaponized to deceive and misinform.
+
+`- Veritas, itself`
 
 ## Requirements
 
