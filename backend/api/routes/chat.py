@@ -1,6 +1,5 @@
 from flask import jsonify, Blueprint, request
 from api.openai import openai
-from flask_cors import cross_origin
 
 # Typing
 from typing import List
@@ -9,7 +8,6 @@ chat = Blueprint("chat", __name__, url_prefix="/chat")
 
 
 @chat.route("/", methods=["POST"])
-@cross_origin()
 def _complete_chat():
     # Get the JSON in the request
     json: dict = request.get_json()

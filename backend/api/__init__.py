@@ -1,4 +1,5 @@
 from flask import Flask, url_for
+from flask_cors import CORS
 from api.routes import register_routes
 
 # Modules
@@ -9,6 +10,7 @@ import api.openai
 def create_app() -> Flask:
     # Create and configure the app
     app = Flask(__name__)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Register all exceptions for routes
     from utils.exceptions import handle_exception
