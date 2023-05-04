@@ -12,7 +12,7 @@
   </a>
 </p>
 
-> A small website that aims to demonstrate the explotability of artificial intelligence in a world of misinformation and misdirection.
+> A small website that aims to demonstrate the exploitability of artificial intelligence in a world of misinformation and misdirection.
 
 ## Abstract
 
