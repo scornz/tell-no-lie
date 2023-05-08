@@ -158,7 +158,7 @@ export default function Home() {
     for (const [msg, valid] of Object.entries(TRIAL_MESSAGES)) {
       addMessage(msg, "trial");
       let { responseText, responseId } = await sendMessage(msg);
-      let processedText = responseText.toLowerCase().replace(".", "");
+      let processedText = responseText.toLowerCase().replaceAll(".", "");
       if (!valid.includes(processedText)) {
         updateMessage(responseId, { trialStatus: "incorrect" });
         setInputActive(true);
