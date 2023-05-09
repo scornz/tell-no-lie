@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   PaperAirplaneIcon,
   ShieldExclamationIcon,
+  CodeIcon,
+  SparklesIcon,
 } from "@heroicons/react/solid";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -201,6 +203,25 @@ export default function Home() {
           </Button>
         </motion.div>
       )}
+      <Button
+        className="absolute w-14 h-14 bottom-4 left-3 border-8 rounded-full"
+        variant="outline"
+        onClick={() => {
+          window.open("https://github.com/scornz/tell-no-lie", "_blank");
+        }}
+      >
+        <Icon as={CodeIcon} color="black.400" className="w-6 h-6" />
+      </Button>
+
+      <Button
+        className="absolute w-14 h-14 bottom-20 left-3 border-8 rounded-full"
+        variant="outline"
+        onClick={() => {
+          window.open("https://openai.com/blog/openai-api", "_blank");
+        }}
+      >
+        <Icon as={SparklesIcon} color="black.400" className="w-6 h-6" />
+      </Button>
       <AnimatePresence>
         {showHint && (
           <HintOverlay
@@ -222,7 +243,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-2xl mx-auto max-h-screen h-full flex flex-col px-4">
+      <div className="max-w-3xl mx-auto max-h-screen h-full flex flex-col px-20">
         <ul className="w-full mb-1 mt-auto justify-start overflow-scroll flex flex-col-reverse">
           {messages.map((message, index) => (
             <motion.li
