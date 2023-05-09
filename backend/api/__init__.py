@@ -10,7 +10,9 @@ import api.openai
 def create_app() -> Flask:
     # Create and configure the app
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": "*"}})
+
+    # Only allow requests from the specified domain
+    CORS(app, resources={r"/*": {"origins": "https://tell-no-lie.com"}})
 
     # Register all exceptions for routes
     from utils.exceptions import handle_exception

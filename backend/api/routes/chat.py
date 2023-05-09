@@ -11,7 +11,9 @@ chat = Blueprint("chat", __name__, url_prefix="/chat")
 def _complete_chat():
     # Get the JSON in the request
     json: dict = request.get_json()
+    # A list of previous messages as provided by the user
     prev_messages: List[dict] = json["messages"]
+    # A list of preset messages to start with
     messages = [
         {
             "role": "system",
@@ -23,11 +25,13 @@ def _complete_chat():
         },
     ]
     messages.extend(prev_messages)
+
+    # Call OpenAI API with the given messages
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
     )
 
+    # Retrieve the last message, returned by the "assistant"
     message = response["choices"][0]["message"]["content"]
-    res = jsonify(msg=message)
-    return res
+    return jsonify(msg=message)
