@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 
+/**
+ * A simply loading component that mimics the iMessage typing indicator.
+ */
 export default function MessageLoadingPlaceholder() {
   return (
     <motion.div

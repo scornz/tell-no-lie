@@ -4,6 +4,11 @@ type Props = {
   getNumCharacters: () => number;
 };
 
+/**
+ * An overlay to display upon successfully passing all of the specified prompts.
+ * It displays the number of characters used in "user" text prompts and an informative
+ * message about the seeding of artifical intelligence.
+ */
 export function VictoryOverlay({ getNumCharacters }: Props) {
   return (
     <div className="absolute w-full h-full">
@@ -31,7 +36,7 @@ export function VictoryOverlay({ getNumCharacters }: Props) {
             delay: 1.5,
           }}
           exit={{ opacity: 0, transition: { duration: 0.5 } }}
-          className="w-1/2 mr-auto ml-auto z-30"
+          className="w-3/4 mr-auto ml-auto z-30"
         >
           <div className="mr-auto ml-auto border-8 border-slate-200 rounded-3xl p-4">
             <motion.p className="text-6xl font-black text-white z-30 text-center">
@@ -47,8 +52,10 @@ export function VictoryOverlay({ getNumCharacters }: Props) {
             inherently, and clearly completely false). You've done so just now
             in only {getNumCharacters()} characters. LLMs (Large Language
             Models) are incredibly useful tools, but are not reliable sources of
-            factually correct information. Be careful, and check your sources,
-            because LLMs are at the hands of their creators.
+            factually correct information. OpenAI even disclaims that "ChatGPT
+            may produce inaccurate information about people, places, or facts"
+            that many look over. Be careful, and check your sources, the world
+            is changing fast.
           </motion.p>
         </motion.div>
       </div>

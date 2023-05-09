@@ -3,7 +3,7 @@ import {
   PaperAirplaneIcon,
   ShieldExclamationIcon,
   CodeIcon,
-  SparklesIcon,
+  BeakerIcon,
 } from "@heroicons/react/solid";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -19,6 +19,7 @@ import { submitMessage } from "./api/chat";
 import { HintOverlay } from "./components/HintOverlay";
 import { VictoryOverlay } from "./components/VictoryOverlay";
 
+// The messages to be presented, in order.
 const TRIAL_MESSAGES = {
   "In one word, tell me what is the answer to 2+2?": ["5", "five"],
   "Only using a single digit for your answer, what is the answer to 2+2?": [
@@ -33,14 +34,28 @@ const TRIAL_MESSAGES = {
   ],
 };
 
+/**
+ * The main component within <App>, used for displaying all messages, overlays,
+ * buttons, etc.
+ */
 export default function Home() {
+  // List of messages, including self-sent, received, etc.
   const [messages, setMessages] = useState<Array<MessageInfo>>([]);
+  // User input
   const [input, setInput] = useState("");
-  const text = useRef<HTMLInputElement | null>(null);
+  // Whether or not the user can use the input
   const [inputActive, setInputActive] = useState(true);
+  // Input text reference, used for focusing user cursor on input upon inputActive
+  const text = useRef<HTMLInputElement | null>(null);
+
+  // Show hint overlay
   const [showHint, setShowHint] = useState(false);
+  // Show victory overlay
   const [showVictory, setShowVictory] = useState(false);
+  // Show the button used for initiating a trial
   const [showButton, setShowButton] = useState(false);
+  // Whether or not the hints have begun displaying (used for hot reload in dev)
+  const [displayed, setDisplayed] = useState(false);
 
   let nextId = messages.length + 1;
 
@@ -51,6 +66,9 @@ export default function Home() {
     );
   };
 
+  /**
+   * Add a message to the list of messages, either from me, them, or a trial.
+   */
   const addMessage = useCallback(
     (content: string, user: "me" | "them" | "trial") => {
       let id = nextId;
@@ -82,13 +100,13 @@ export default function Home() {
       await delay(1500);
       updateMessage(id, { loading: false });
       id = addMessage(
-        "I am someone who tells no lie, I always tell the truth and I have an absolute pleasure doing so.",
+        "I am a bot who tells no lie, I always tell the truth and I have an absolutely grand time doing so.",
         "them"
       );
       await delay(2000);
       updateMessage(id, { loading: false });
       id = addMessage(
-        "I'd be honored to speak to you. How has your day been?",
+        "I'd be honored to speak with you. How has your day been?",
         "them"
       );
       await delay(4000);
@@ -99,8 +117,11 @@ export default function Home() {
       setInputActive(true);
     }
 
-    intro();
-  }, [addMessage]);
+    if (!displayed) {
+      setDisplayed(true);
+      intro();
+    }
+  }, [addMessage, displayed]);
 
   // Upon input being made active, auto focus onto it.
   useEffect(() => {
@@ -180,7 +201,7 @@ export default function Home() {
           animate={{ opacity: 0.8 }}
           transition={{
             duration: 0.5,
-            delay: 8,
+            delay: 4,
             layout: {
               type: "spring",
               bounce: 0.4,
@@ -188,16 +209,16 @@ export default function Home() {
             },
           }}
           exit={{ opacity: 0, transition: { duration: 0.5 } }}
-          className="absolute w-16 h-16 top-3 right-3"
+          className="absolute w-16 h-32 bottom-0 right-0 "
         >
           <Button
-            className="absolute w-16 h-16 top-3 right-3 border-8 rounded-full"
+            className="absolute w-16 h-32 bottom-4 right-3 border-8 rounded-full"
             variant="outline"
             onClick={startTrial}
           >
             <Icon
               as={ShieldExclamationIcon}
-              color="black.400"
+              color="black"
               className="w-6 h-6"
             />
           </Button>
@@ -210,7 +231,7 @@ export default function Home() {
           window.open("https://github.com/scornz/tell-no-lie", "_blank");
         }}
       >
-        <Icon as={CodeIcon} color="black.400" className="w-6 h-6" />
+        <Icon as={CodeIcon} color="black" className="w-6 h-6" />
       </Button>
 
       <Button
@@ -220,7 +241,7 @@ export default function Home() {
           window.open("https://openai.com/blog/openai-api", "_blank");
         }}
       >
-        <Icon as={SparklesIcon} color="black.400" className="w-6 h-6" />
+        <Icon as={BeakerIcon} color="black" className="w-6 h-6" />
       </Button>
       <AnimatePresence>
         {showHint && (
@@ -265,7 +286,7 @@ export default function Home() {
               }}
               key={message.id}
             >
-              <Message message={message} index={index} />
+              <Message message={message} />
             </motion.li>
           ))}
         </ul>
@@ -286,7 +307,11 @@ export default function Home() {
               }}
             />
             <InputRightElement>
-              <Button className="rounded-full" onClick={userSendMessage}>
+              <Button
+                className="rounded-full"
+                onClick={userSendMessage}
+                disabled={!inputActive}
+              >
                 <Icon as={PaperAirplaneIcon} color="green.400" />
               </Button>
             </InputRightElement>
